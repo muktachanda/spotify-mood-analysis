@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>moodsync</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h1 {
+        color: #1db954;
+    }
+
+    button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #1db954;
+        /* Green color */
+        color: #fff;
+        /* White text */
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #15a135;
+        /* Darker green color on hover */
+    }
+
+    p {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>moodsync</h1>
+        <button id="authorizeBtn">Authorize Spotify</button>
+        <p id="moodText"></p>
+    </div>
+
+    <script>
+        document.getElementById("authorizeBtn").addEventListener("click", function () {
+            fetch("http://localhost:5000/authorize")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to authorize Spotify.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    window.open(data.authorization_url, "_blank");
+                    document.getElementById("moodText").innerText = "Authorization started. Please check your browser to complete the process.";
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    </script>
+</body>
+
+</html>

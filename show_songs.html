@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1db954;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        a {
+            color: #1db954;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1db954;
+            /* Green color */
+            color: #fff;
+            /* White text */
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #15a135;
+            /* Darker green color on hover */
+        }
+    </style>
+</head>
+
+<body onLoad="show_songs()">
+    <div class="container">
+        <h1>Spotify Analysis</h1>
+        <button onclick="window.location.href = '/analysis';">Analyze my Songs</button>
+        <div id="analysisResult"></div>
+    </div>
+
+    <script>
+        function show_songs() {
+            fetch("http://localhost:5000/show_songs_list")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch analysis data.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Display analysis results
+                    displayAnalysis(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        function displayAnalysis(data) {
+            var analysisResultDiv = document.getElementById("analysisResult");
+
+            // Example: Display user's recently played tracks
+            var tracks = data.tracks;
+            var tracksHtml = "<h2>Recently Played Tracks</h2><ul>";
+            tracks.forEach(function (track) {
+                tracksHtml += "<li><strong>" + track.name + "</strong> by " + track.artists[0].name + "</li>";
+            });
+            tracksHtml += "</ul>";
+
+            analysisResultDiv.innerHTML = tracksHtml;
+        }
+    </script>
+</body>
+
+</html>

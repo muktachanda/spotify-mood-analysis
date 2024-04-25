@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #1db954;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        canvas {
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body onLoad="analyze()">
+    <div class="container">
+        <h1>Spotify Analysis</h1>
+        <div id="loading" class="loading">Analyzing...</div>
+        <div id="analysisResult" style="display: none;"></div>
+        <canvas id="moodGraph" style="display: none;"></canvas>
+    </div>
+
+    <script>
+        function analyze() {
+            // Show loading element
+            document.getElementById('loading').style.display = 'block';
+
+            fetch("http://localhost:5000/analyze")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to analyze songs.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading element
+                    document.getElementById('loading').style.display = 'none';
+                    // Display analysis results
+                    displayAnalysis(data);
+                    displayGraph(data);
+                    // Show analysis result and graph
+                    document.getElementById('analysisResult').style.display = 'block';
+                    document.getElementById('moodGraph').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error(error);
+                    // Hide loading element
+                    document.getElementById('loading').style.display = 'none';
+                });
+        }
+
+        function displayAnalysis(data) {
+            var analysisResult = document.getElementById('analysisResult');
+            var moodData = data.mood_data;
+            var moodText = data.mood_text;
+
+            var resultHTML = '<h2>Your mood is ' + moodText + '</h2>';
+            resultHTML += '<h2>Mood Distribution</h2>';
+            resultHTML += '<ul>';
+            for (var mood in moodData) {
+                resultHTML += '<li>' + mood + ': ' + moodData[mood] + '</li>';
+            }
+            resultHTML += '</ul>';
+
+            analysisResult.innerHTML = resultHTML;
+        }
+
+        function displayGraph(data) {
+            var moodData = data.mood_data;
+            var labels = Object.keys(moodData);
+            var dataValues = Object.values(moodData);
+
+            var ctx = document.getElementById('moodGraph').getContext('2d');
+            var moodChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Mood Distribution',
+                        data: dataValues,
+                        backgroundColor: '#1db954',
+                        borderColor: '#1db954',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+
+</html>
