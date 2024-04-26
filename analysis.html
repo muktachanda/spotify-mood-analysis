@@ -22,7 +22,8 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             text-align: center;
             color: #1db954;
         }
@@ -106,7 +107,9 @@
             resultHTML += '<h2>Mood Distribution</h2>';
             resultHTML += '<ul>';
             for (var mood in moodData) {
+                if (mood !== 'unknown') { 
                 resultHTML += '<li>' + mood + ': ' + moodData[mood] + '</li>';
+                }
             }
             resultHTML += '</ul>';
 
@@ -116,32 +119,54 @@
         function displayGraph(data) {
             var moodData = data.mood_data;
             var labels = Object.keys(moodData);
-            var dataValues = Object.values(moodData);
+
+            labels = labels.filter(mood => mood !== 'unknown');
+
+            // Assign values based on mood
+            var dataValues = labels.map(mood => {
+                switch (mood) {
+                    case 'happy':
+                        return 100; // Assign high value to happy
+                    case 'calm':
+                        return 75; // Assign medium-high value to calm
+                    case 'sad':
+                        return 50; // Assign medium value to sad
+                    case 'anxious':
+                        return 25; // Assign medium-low value to anxious
+                    default:
+                        return 0; // Assign low value to unknown
+                }
+            });
 
             var ctx = document.getElementById('moodGraph').getContext('2d');
             var moodChart = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Mood Distribution',
+                        label: 'Mood Timeline',
                         data: dataValues,
-                        backgroundColor: '#1db954',
+                        backgroundColor: 'rgba(29, 185, 84, 0.2)',
                         borderColor: '#1db954',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        pointRadius: 4, // Increase point size for better visibility
+                        pointBackgroundColor: '#1db954' // Set point color same as line color
                     }]
                 },
                 options: {
                     scales: {
                         yAxes: [{
                             ticks: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                max: 100 // Set maximum value to 100
                             }
                         }]
                     }
                 }
             });
         }
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
